@@ -18,6 +18,7 @@ services:
     container_name: opencode-app
     depends_on:
       - nginx-api-gateway
+    entrypoint: /bin/sh
     environment:
       - OPENAI_API_KEY=SANDBOX_MANAGED
       - OPENCODE_CONFIG=/tmp/opencode.json
@@ -28,7 +29,6 @@ services:
     networks:
       - opencode_isolated
     command:
-      - /bin/sh
       - -c
       - |
         # Generate opencode.json with dynamic models
