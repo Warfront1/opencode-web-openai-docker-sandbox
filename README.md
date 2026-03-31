@@ -2,6 +2,9 @@
 
 A secure way to run OpenCode Web with any OpenAI-compatible provider in a container until official Docker Sandbox support is added.
 
+> [!TIP]
+> This sandbox is specifically pre-configured for **OpenAI-compatible providers** (like Groq, Mistral, or self-hosted LLMs) using the `@ai-sdk/openai-compatible` standard.
+
 ### Architecture
 
 ```mermaid
@@ -57,7 +60,8 @@ graph TD
    - **Web:** http://127.0.0.1:4096/
    - **TUI:**
      ```bash
-     docker exec -it opencode-app opencode --model 'openai/your-model-name'
+      docker exec -it opencode-app opencode --model 'my-openai-compatible-provider/your-model-name'
+
      ```
 
 ---
