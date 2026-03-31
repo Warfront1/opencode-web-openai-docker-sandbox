@@ -10,7 +10,7 @@ A secure way to run OpenCode Web with any OpenAI-compatible provider in a contai
 ```mermaid
 graph TD
     subgraph Internet
-        API[Custom OpenAI-Compatible API]
+        API[OpenAI-Compatible API]
     end
 
     subgraph "Docker Sandbox"
@@ -27,27 +27,31 @@ graph TD
         NG -- "Web UI Proxy" --> OC
     end
 
-    NG -- "Secure Proxy (TLS/MTLS)<br/>(Custom OpenAI Key/Base)" --> API
+    NG -- "Secure Proxy (TLS/MTLS)<br/>(Custom API Key/Base)" --> API
     User((User)) -- "Web: http://127.0.0.1:4096" --> NG
     User((User)) -- "TUI: docker exec" --> OC
 ```
 
 ### Key Features
+- **OpenAI-Compatible Focused:** Pre-configured to work seamlessly with any OpenAI-compatible API provider using the `@ai-sdk/openai-compatible` standard.
 - **Network Isolation:** `opencode-app` has no direct internet access.
 - **Secure Proxy:** `nginx-api-gateway` handles external communication, prevents header leaks, and enforces a 1M request limit.
 - **Environment Safety:** API keys are managed by `nginx-api-gateway` and isolated from `opencode-app`.
-- **Custom Provider Support:** Easily use any OpenAI-compatible endpoint (Self-hosted, Groq, Mistral, etc.).
+- **Custom Provider Support:** Easily use any OpenAI-compatible endpoint.
 - **Volume Mounting:** Expose your project via `PROJECT_DIR`.
 
 ### Quick Start
 1. **Set your API Configuration:**
    ```bash
    # Required: Your API Key
-   export OPENAI_API_KEY=your_key_here
+   export CUSTOM_API_KEY=your_key_here
 
    # Required: The full base URL of your provider (including trailing slash)
-   # Example for Groq: https://api.groq.com/openai/v1/
-   export OPENAI_API_BASE=https://api.yourprovider.com/v1/
+   export CUSTOM_API_BASE=https://api.yourprovider.com/v1/
+
+   # Optional: Comma-separated list of models to make available
+   # Example: export CUSTOM_MODELS=llama3-70b,mixtral-8x7b
+   export CUSTOM_MODELS=your-model-name
    ```
 2. **Launch the Sandbox:**
    ```bash

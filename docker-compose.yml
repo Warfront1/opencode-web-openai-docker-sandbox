@@ -3,8 +3,8 @@ services:
     image: nginx:alpine
     container_name: nginx-api-gateway
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY:?error}
-      - OPENAI_API_BASE=${OPENAI_API_BASE:?error}
+      - OPENAI_API_KEY=${CUSTOM_API_KEY:?error}
+      - OPENAI_API_BASE=${CUSTOM_API_BASE:?error}
     volumes:
       - ./config/nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
@@ -20,14 +20,44 @@ services:
       - nginx-api-gateway
     environment:
       - OPENAI_API_KEY=SANDBOX_MANAGED
-      - OPENCODE_CONFIG=/config/opencode.json
+      - OPENCODE_CONFIG=/tmp/opencode.json
+      - CUSTOM_MODELS=${CUSTOM_MODELS:-}
     volumes:
-      - ./config/opencode/opencode.json:/config/opencode.json:ro
       - ${PROJECT_DIR:?error}:/workspace
     working_dir: /workspace
     networks:
       - opencode_isolated
-    command: ["web", "--port", "4096", "--hostname", "0.0.0.0"]
+    command:
+      - /bin/sh
+      - -c
+      - |
+        # Generate opencode.json with dynamic models
+        MODELS_JSON="{}"
+        if [ -n "$$CUSTOM_MODELS" ]; then
+          MODELS_JSON=""
+          for m in $$(echo $$CUSTOM_MODELS | tr ',' ' '); do
+            MODELS_JSON="$$MODELS_JSON \"$$m\": { \"name\": \"$$m\" },"
+          done
+          MODELS_JSON="{ $${MODELS_JSON%,} }"
+        fi
+
+        cat <<EOF > /tmp/opencode.json
+        {
+          "\$schema": "https://opencode.ai/config.json",
+          "provider": {
+            "my-openai-compatible-provider": {
+              "npm": "@ai-sdk/openai-compatible",
+              "name": "My OpenAI-Compatible Provider",
+              "options": {
+                "baseURL": "http://nginx-api-gateway/api/v1"
+              },
+              "models": $$MODELS_JSON
+            }
+          }
+        }
+        EOF
+
+        exec opencode web --port 4096 --hostname 0.0.0.0
     stdin_open: true
     tty: true
 
