@@ -18,46 +18,17 @@ services:
     container_name: opencode-app
     depends_on:
       - nginx-api-gateway
-    entrypoint: /bin/sh
     environment:
       - OPENAI_API_KEY=SANDBOX_MANAGED
       - OPENCODE_CONFIG=/tmp/opencode.json
       - CUSTOM_MODELS=${CUSTOM_MODELS:-}
     volumes:
       - ${PROJECT_DIR:?error}:/workspace
+      - ./config/opencode/entrypoint.sh:/entrypoint.sh:ro
     working_dir: /workspace
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       - opencode_isolated
-    command:
-      - -c
-      - |
-        # Generate opencode.json with dynamic models
-        MODELS_JSON="{}"
-        if [ -n "$$CUSTOM_MODELS" ]; then
-          MODELS_JSON=""
-          for m in $$(echo $$CUSTOM_MODELS | tr ',' ' '); do
-            MODELS_JSON="$$MODELS_JSON \"$$m\": { \"name\": \"$$m\" },"
-          done
-          MODELS_JSON="{ $${MODELS_JSON%,} }"
-        fi
-
-        cat <<EOF > /tmp/opencode.json
-        {
-          "\$schema": "https://opencode.ai/config.json",
-          "provider": {
-            "my-openai-compatible-provider": {
-              "npm": "@ai-sdk/openai-compatible",
-              "name": "My OpenAI-Compatible Provider",
-              "options": {
-                "baseURL": "http://nginx-api-gateway/api/v1"
-              },
-              "models": $$MODELS_JSON
-            }
-          }
-        }
-        EOF
-
-        exec opencode web --port 4096 --hostname 0.0.0.0
     stdin_open: true
     tty: true
 
