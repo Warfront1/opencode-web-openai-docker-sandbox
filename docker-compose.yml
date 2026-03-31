@@ -29,6 +29,7 @@ services:
     entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       - opencode_isolated
+      - internet_access
     stdin_open: true
     tty: true
 

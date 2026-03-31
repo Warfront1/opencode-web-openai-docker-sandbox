@@ -15,7 +15,7 @@ graph TD
 
     subgraph "Docker Sandbox"
         direction TB
-        subgraph "Internal Isolated Network"
+        subgraph "App Network"
             OC[opencode-app<br/>Port 4096]
         end
 
@@ -34,8 +34,8 @@ graph TD
 
 ### Key Features
 - **OpenAI-Compatible Focused:** Pre-configured to work seamlessly with any OpenAI-compatible API provider using the `@ai-sdk/openai-compatible` standard.
-- **Network Isolation:** `opencode-app` has no direct internet access.
-- **Secure Proxy:** `nginx-api-gateway` handles external communication, prevents header leaks, and enforces a 1M request limit.
+- **Network Flexibility:** `opencode-app` has internet access by default (easily toggleable).
+- **Secure Proxy:** `nginx-api-gateway` handles external communication, prevents header leaks, and enforces a 10M request limit.
 - **Environment Safety:** API keys are managed by `nginx-api-gateway` and isolated from `opencode-app`.
 - **Custom Provider Support:** Easily use any OpenAI-compatible endpoint.
 - **Volume Mounting:** Expose your project via `PROJECT_DIR`.
@@ -80,23 +80,23 @@ graph TD
 
 ## Optional: Toggling the Air Gap
 
-**The air gap is enabled by default** - the sandbox is secure out of the box with no additional configuration needed.  
-This section is only for advanced users who would want to toggle the air gap off, and then back on again.
+**The air gap is disabled by default** to ensure OpenCode can download necessary plugins and dependencies.
+This section is for users who want to toggle the air gap on for maximum security.
 
 > [!WARNING]
-> Removing the air gap grants the AI assistant direct internet access.
+> Removing the air gap (default state) grants the AI assistant direct internet access.
 > Only do this if you trust the AI model and understand the security implications.
 >
 > LLM API requests will still be routed securely through the NGINX gateway.
 
-**Remove Air Gap (Grant Internet Access):**
-```bash
-docker network connect opencode-web-openai-docker-sandbox_internet_access opencode-app
-```
-
-**Restore Air Gap (Revoke Internet Access):**
+**Enable Air Gap (Revoke Internet Access):**
 ```bash
 docker network disconnect opencode-web-openai-docker-sandbox_internet_access opencode-app
+```
+
+**Disable Air Gap (Grant Internet Access):**
+```bash
+docker network connect opencode-web-openai-docker-sandbox_internet_access opencode-app
 ```
 
 **Verify Network Status:**
