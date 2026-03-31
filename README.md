@@ -46,7 +46,9 @@ graph TD
    # Required: Your API Key
    export CUSTOM_API_KEY=your_key_here
 
-   # Required: The full base URL of your provider (including trailing slash)
+   # Required: The full base URL of your provider (including the API version path and trailing slash)
+   # Example for OpenAI: https://api.openai.com/v1/
+   # Example for a custom gateway: https://my-gateway.com/custom-path/v1/
    export CUSTOM_API_BASE=https://api.yourprovider.com/v1/
 
    # Optional: Comma-separated list of models to make available
@@ -65,8 +67,14 @@ graph TD
    - **TUI:**
      ```bash
       docker exec -it opencode-app opencode --model 'my-openai-compatible-provider/your-model-name'
-
      ```
+
+> [!NOTE]
+> **Understanding `CUSTOM_API_BASE`:**
+> The sandbox expects you to provide the *entire* base URL for your provider, including the versioned path (e.g., `/v1/`).
+> The gateway will automatically handle request routing.
+> - If your provider's full chat endpoint is `https://api.provider.com/v1/chat/completions`, set `CUSTOM_API_BASE` to `https://api.provider.com/v1/`.
+> - If you encounter 404 errors, check the `X-Upstream-Url` header in the gateway logs to see the exact URL being requested.
 
 ---
 
