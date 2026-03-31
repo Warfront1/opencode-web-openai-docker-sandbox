@@ -12,8 +12,9 @@ server {
 
     # Extract upstream host for proper SNI and Host header
     # This is required for correct TLS (SNI) and routing with cloud providers
+    set $base_url "${OPENAI_API_BASE}";
     set $upstream_host "";
-    if ("${OPENAI_API_BASE}" ~* "^https?://([^/]+)") {
+    if ($base_url ~* "^https?://([^/]+)") {
         set $upstream_host $1;
     }
 
