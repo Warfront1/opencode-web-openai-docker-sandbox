@@ -7,7 +7,7 @@ server {
     client_max_body_size 50M;
     client_body_buffer_size 50M;
 
-    resolver 127.0.0.11 valid=30s; # Docker DNS
+    resolver 127.0.0.11 ipv6=off valid=30s; # Docker DNS (IPv6 disabled to prevent resolution hangs)
     resolver_timeout 5s;
 
     # Extract upstream host for proper SNI and Host header
@@ -33,7 +33,12 @@ server {
 
         proxy_ssl_server_name on;
         proxy_ssl_name $upstream_host;
+        proxy_ssl_session_reuse off; # Prevent hangs with certain upstream gateways
         
+        proxy_buffer_size 128k;
+        proxy_buffers 4 256k;
+        proxy_busy_buffers_size 256k;
+
         # Optimize for streaming LLM responses
         proxy_http_version 1.1;
         proxy_set_header Connection "";
@@ -65,6 +70,8 @@ server {
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
+        proxy_buffering off; # Critical for real-time UI updates (SSE)
+        proxy_request_buffering off;
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
