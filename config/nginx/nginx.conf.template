@@ -4,21 +4,31 @@ server {
     server_name _;
 
     # Prevent a massive file-leak from even leaving your machine
-    client_max_body_size 1M;
+    client_max_body_size 10M;
+    client_body_buffer_size 10M;
 
     resolver 8.8.8.8 1.1.1.1 valid=300s;
     resolver_timeout 5s;
 
-    location /api/v1/ {
+    # Match and capture everything after /api/v1/
+    location ~ ^/api/v1/(.*)$ {
+        set $upstream_path $1;
+        set $upstream_url "${OPENAI_API_BASE}${upstream_path}";
+        
         proxy_pass_request_headers off;
         proxy_set_header Authorization "Bearer ${OPENAI_API_KEY}";
         proxy_set_header Content-Type "application/json";
         proxy_ssl_server_name on;
         
-        # We use a variable for proxy_pass to force Nginx to use the resolver
-        # and allow for dynamic targets via environment variables.
-        set $openai_base "${OPENAI_API_BASE}";
-        proxy_pass $openai_base;
+        # Long timeouts for LLM responses
+        proxy_connect_timeout 60s;
+        proxy_send_timeout 300s;
+        proxy_read_timeout 300s;
+        
+        # Debug: Shows final upstream URL in response headers
+        add_header X-Upstream-Url $upstream_url always;
+        
+        proxy_pass $upstream_url;
     }
 }
 

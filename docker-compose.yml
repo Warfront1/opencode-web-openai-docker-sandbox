@@ -3,8 +3,8 @@ services:
     image: nginx:alpine
     container_name: nginx-api-gateway
     environment:
-      - OPENAI_API_KEY=${OPENAI_API_KEY:?error}
-      - OPENAI_API_BASE=${OPENAI_API_BASE:?error}
+      - OPENAI_API_KEY=${CUSTOM_API_KEY:?error}
+      - OPENAI_API_BASE=${CUSTOM_API_BASE:?error}
     volumes:
       - ./config/nginx/nginx.conf.template:/etc/nginx/templates/default.conf.template:ro
     ports:
@@ -20,14 +20,16 @@ services:
       - nginx-api-gateway
     environment:
       - OPENAI_API_KEY=SANDBOX_MANAGED
-      - OPENCODE_CONFIG=/config/opencode.json
+      - OPENCODE_CONFIG=/tmp/opencode.json
+      - CUSTOM_MODELS=${CUSTOM_MODELS:-}
     volumes:
-      - ./config/opencode/opencode.json:/config/opencode.json:ro
       - ${PROJECT_DIR:?error}:/workspace
+      - ./config/opencode/entrypoint.sh:/entrypoint.sh:ro
     working_dir: /workspace
+    entrypoint: ["/bin/sh", "/entrypoint.sh"]
     networks:
       - opencode_isolated
-    command: ["web", "--port", "4096", "--hostname", "0.0.0.0"]
+      - internet_access
     stdin_open: true
     tty: true
 
