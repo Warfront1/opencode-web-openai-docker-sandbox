@@ -51,14 +51,15 @@ graph TD
    # Example for a custom gateway: https://my-gateway.com/custom-path/v1/
    export CUSTOM_API_BASE=https://api.yourprovider.com/v1/
 
-    # Optional: Comma-separated list of models to make available
-    # Example: export CUSTOM_MODELS=llama3-70b,mixtral-8x7b
-    export CUSTOM_MODELS=your-model-name
-
-    # Optional: AI SDK provider package (defaults to @ai-sdk/openai-compatible)
-    # For the Responses API (not Completions), export CUSTOM_PROVIDER=@ai-sdk/openai
-    # Example: export CUSTOM_PROVIDER=@ai-sdk/openai
-    ```
+   # Required
+   # Example: export CUSTOM_MODELS=llama3-70b,mixtral-8x7b
+   export CUSTOM_MODELS=your-model-name
+    
+   # Required
+   # For the Chat Completions API export CUSTOM_PROVIDER=@ai-sdk/openai-compatible
+   # For the Responses API, export CUSTOM_PROVIDER=@ai-sdk/openai
+   export CUSTOM_PROVIDER=@ai-sdk/openai-compatible
+   ```
 2. **Launch the Sandbox:**
    ```bash
    # PROJECT_DIR: The directory of YOUR project that you want OpenCode to work on
