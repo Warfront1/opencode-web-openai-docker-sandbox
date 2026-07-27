@@ -22,6 +22,7 @@ services:
       - OPENAI_API_KEY=SANDBOX_MANAGED
       - OPENCODE_CONFIG=/tmp/opencode.json
       - CUSTOM_MODELS=${CUSTOM_MODELS:-}
+      - CUSTOM_PROVIDER
     volumes:
       - ${PROJECT_DIR:?error}:/workspace
       - ./config/opencode/entrypoint.sh:/entrypoint.sh:ro

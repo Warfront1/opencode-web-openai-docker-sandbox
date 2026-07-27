@@ -1,6 +1,7 @@
 #!/bin/sh
 
 CONFIG_FILE="/tmp/opencode.json"
+PROVIDER_NPM="${CUSTOM_PROVIDER:-@ai-sdk/openai-compatible}"
 
 generate_models_json() {
     if [ -z "$CUSTOM_MODELS" ]; then
@@ -22,7 +23,7 @@ cat > "$CONFIG_FILE" <<EOF
 {
   "provider": {
     "my-openai-compatible-provider": {
-      "npm": "@ai-sdk/openai-compatible",
+      "npm": "$PROVIDER_NPM",
       "name": "My OpenAI-Compatible Provider",
       "options": {
         "baseURL": "http://nginx-api-gateway/api/v1"
